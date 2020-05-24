@@ -27,7 +27,99 @@ class MainActivity : AppCompatActivity() {
 
         //getPosts()
 
-        getComments()
+        //getComments()
+
+        createPost()
+    }
+
+    private fun getPosts() {
+
+        val parameters: MutableMap<String, String> = HashMap()
+        parameters["userId"] = "1"
+        parameters["_sort"] = "id"
+        parameters["_order"] = "desc"
+
+
+        /* val call: Call<List<Post>> = jsonPlaceHolderApi.getPosts(4, "id", "desc")*/
+
+        val call: Call<List<Post>> = jsonPlaceHolderApi.getPosts(parameters)
+        call.enqueue(object : Callback<List<Post>> {
+
+            @SuppressLint("SetTextI18n")
+            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
+
+                if (!response.isSuccessful) {
+                    text_view_result.text = "Code: ${response.code()}"
+                    return
+                }
+                val posts: List<Post>? = response.body()
+                posts?.let {
+
+                    for (post: Post in posts) {
+
+                        var content = ""
+                        content += "ID: ${post.id}\n"
+                        content += "User ID: ${post.userId}\n"
+                        content += "Title: ${post.title}\n"
+                        content += "Text: ${post.text}\n\n"
+
+                        text_view_result.append(content)
+                    }
+                }
+
+            }
+
+            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
+
+                text_view_result.text = t.message
+
+            }
+        })
+
+    }
+
+    private fun createPost() {
+
+
+
+        /*val post = Post(23, null, "New Title", "New Text")*/
+        /*  val call = jsonPlaceHolderApi.createPost(post)*/
+
+        val fields: MutableMap<String, String> = HashMap()
+        fields["userId"] = "23"
+        fields["title"] = "New Title"
+        fields["text"]  = "NewText"
+
+        /* val call = jsonPlaceHolderApi.createPost(23, "New Title", "New Text")*/
+
+        val call = jsonPlaceHolderApi.createPost(fields)
+
+        call.enqueue(object : Callback<Post> {
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                text_view_result.text = t.message
+            }
+
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                if (!response.isSuccessful) {
+                    text_view_result.text = "Code: ${response.code()}"
+                    return
+                }
+
+                val postResponse = response.body()
+
+                postResponse?.let {
+
+                    var content = ""
+                    content += "Code: ${response.code()}\n"
+                    content += "ID: ${postResponse.id}\n"
+                    content += "User ID: ${postResponse.userId}\n"
+                    content += "Title: ${postResponse.title}\n"
+                    content += "Text: ${postResponse.text}\n\n"
+
+                    text_view_result.append(content)
+                }
+            }
+        })
     }
 
     private fun getComments() {
@@ -72,49 +164,5 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getPosts() {
 
-        val parameters: MutableMap<String, String> = HashMap()
-        parameters["userId"] = "1"
-        parameters["_sort"] = "id"
-        parameters["_order"] = "desc"
-
-
-       /* val call: Call<List<Post>> = jsonPlaceHolderApi.getPosts(4, "id", "desc")*/
-
-        val call: Call<List<Post>> = jsonPlaceHolderApi.getPosts(parameters)
-        call.enqueue(object : Callback<List<Post>> {
-
-            @SuppressLint("SetTextI18n")
-            override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
-
-                if (!response.isSuccessful) {
-                    text_view_result.text = "Code: ${response.code()}"
-                    return
-                }
-                val posts: List<Post>? = response.body()
-                posts?.let {
-
-                    for (post: Post in posts) {
-
-                        var content = ""
-                        content += "ID: ${post.id}\n"
-                        content += "User ID: ${post.userId}\n"
-                        content += "Title: ${post.title}\n"
-                        content += "Text: ${post.text}\n\n"
-
-                        text_view_result.append(content)
-                    }
-                }
-
-            }
-
-            override fun onFailure(call: Call<List<Post>>, t: Throwable) {
-
-                text_view_result.text = t.message
-
-            }
-        })
-
-    }
 }
